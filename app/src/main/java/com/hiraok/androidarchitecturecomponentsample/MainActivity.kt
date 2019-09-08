@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     }
 
     private fun sort() {
-        val li = list.sortedBy { it.price[0].price }
+        val li = list.sortedBy { it.price[0].taxPrice }
         section.update(li)
     }
 
