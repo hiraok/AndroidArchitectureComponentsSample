@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">AndroidArchitectureComponentSample</string>
     <string name="string_main">タスク</string>
+    <string name="header_title">ヘッダー</string>
+    <string name="header_subtitle">サブヘッダー</string>
 </resources>
