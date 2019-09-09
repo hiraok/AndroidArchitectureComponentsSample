@@ -51,26 +51,59 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
         return true
     }
 
-    private fun showPopup(v: View) {
-        val popup = PopupMenu(this, v, Gravity.RIGHT)
-        val inflater: MenuInflater = popup.menuInflater
-        inflater.inflate(R.menu.menu_sort, popup.menu)
-        popup.setOnMenuItemClickListener(this)
-        popup.show()
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         when (item.itemId) {
-            R.id.menu_option -> showPopup(toolbar)
+            R.id.sort -> showPopup(toolbar, 1)
+            R.id.filter -> showPopup(toolbar, 2)
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onMenuItemClick(p0: MenuItem?): Boolean {
-        when (p0?.itemId) {
-            R.id.price -> sort()
+    private fun showPopup(v: View, type: Int) {
+        val popup = PopupMenu(this, v, Gravity.RIGHT)
+        val inflater: MenuInflater = popup.menuInflater
+        val resId = when (type) {
+            1 -> R.menu.menu_sort
+            2 -> R.menu.menu_filter
+            else -> 0
         }
-        return true
+        inflater.inflate(resId, popup.menu)
+        popup.setOnMenuItemClickListener(this)
+        popup.show()
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        item ?: return false
+
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
+        item.actionView = View(this)
+        item.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(p0: MenuItem?): Boolean {
+                when (item.itemId) {
+                    R.id.price -> {
+                        sort()
+                    }
+                    R.id.filter1 -> {
+                        item.isChecked = !item.isChecked
+                        filter(1, item.isChecked)
+                    }
+                    R.id.filter2 -> {
+                        item.isChecked = !item.isChecked
+                        filter(2, item.isChecked)
+                    }
+                }
+                return false
+            }
+
+            override fun onMenuItemActionCollapse(p0: MenuItem?): Boolean {
+                return false
+            }
+
+        })
+
+        return false
     }
 
     private fun setupRecyclerView() {
@@ -92,6 +125,22 @@ class MainActivity : AppCompatActivity(), PopupMenu.OnMenuItemClickListener {
     private fun sort() {
         val li = list.sortedBy { it.price[0].taxPrice }
         section.update(li)
+    }
+
+    private fun filter(type: Int, isChecked: Boolean) {
+        if (isChecked) {
+            when (type) {
+                1 -> list.filter { it.id == "2" }.also {
+                    section.update(it)
+                }
+                2 -> list.filter { it.price[0].price >= 300 }.also {
+                    section.update(it)
+                }
+            }
+        } else {
+            section.update(list)
+        }
+
     }
 
 }
